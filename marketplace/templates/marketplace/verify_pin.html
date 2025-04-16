@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Verify PIN</title>
+</head>
+<body>
+    <h1>Verify Your Account</h1>
+    {% if messages %}
+        <div>
+            {% for message in messages %}
+                <p {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% if email %}
+        <p>A verification PIN has been sent to your email address: <strong>{{ email }}</strong>. Please enter it below.</p>
+        <form method="post">
+            {% csrf_token %}
+            <p>{{ form.pin.label_tag }} {{ form.pin }}</p>
+            <button type="submit">Verify PIN</button>
+        </form>
+        <p>Didn't receive the PIN? (We'll implement resend later)</p>
+    {% else %}
+        <p>Something went wrong. Please try registering again.</p>
+        <p><a href="{% url 'register' %}">Register</a></p>
+    {% endif %}
+    <p><a href="{% url 'home' %}">Back to Home</a></p>
+</body>
+</html>

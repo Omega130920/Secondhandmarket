@@ -1,0 +1,9 @@
+<h1>Confirm Simulated Payment</h1>
+<p>You are about to confirm your simulated payment for the item: {{ message.item.title }} to user: {{ message.item.seller.username }}.</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Confirm Payment</button>
+</form>
+
+<p><a href="{% url 'user_dashboard' %}">Back to Dashboard</a></p>

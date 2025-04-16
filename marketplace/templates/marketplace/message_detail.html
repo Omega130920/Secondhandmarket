@@ -1,0 +1,9 @@
+<h1>Message Detail</h1>
+
+<p><strong>From:</strong> {{ message.sender.username }}</p>
+<p><strong>To:</strong> {{ message.recipient.username }}</p>
+<p><strong>Subject:</strong> {{ message.subject }}</p>
+<p><strong>Sent at:</strong> {{ message.sent_at }}</p>
+<p><strong>Message:</strong> {{ message.body|linebreaksbr }}</p>
+
+<p><a href="{% url 'user_dashboard' %}">Back to Dashboard</a></p>

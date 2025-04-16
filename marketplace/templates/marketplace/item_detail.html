@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ item.title }} - Item Detail</title>
+    <style>
+        .item-images-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .item-image-detail {
+            max-width: 300px;
+            height: auto;
+            border: 1px solid #eee;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ item.title }}</h1>
+    <p><strong>Category:</strong> {{ item.category.name }}</p>
+    <p><strong>Condition:</strong> {{ item.get_condition_display }}</p>
+    <p><strong>Price:</strong> {{ item.price }}</p>
+    <p><strong>Description:</strong></p>
+    <p>{{ item.description|linebreaksbr }}</p>
+
+    <h2>Images</h2>
+    <div class="item-images-gallery">
+        {% if item.image1 %}
+            <img src="{{ item.image1.url }}" alt="{{ item.title }} - Image 1" class="item-image-detail">
+        {% endif %}
+        {% if item.image2 %}
+            <img src="{{ item.image2.url }}" alt="{{ item.title }} - Image 2" class="item-image-detail">
+        {% endif %}
+        {% if item.image3 %}
+            <img src="{{ item.image3.url }}" alt="{{ item.title }} - Image 3" class="item-image-detail">
+        {% endif %}
+        {% if item.image4 %}
+            <img src="{{ item.image4.url }}" alt="{{ item.title }} - Image 4" class="item-image-detail">
+        {% endif %}
+        {% if item.image5 %}
+            <img src="{{ item.image5.url }}" alt="{{ item.title }} - Image 5" class="item-image-detail">
+        {% endif %}
+        {% if item.image6 %}
+            <img src="{{ item.image6.url }}" alt="{{ item.title }} - Image 6" class="item-image-detail">
+        {% endif %}
+    </div>
+
+    <p><strong>Seller:</strong> {{ item.seller.username }}</p>
+    {% if user.is_authenticated and user != item.seller and not is_buyer %}
+        <p><a href="{% url 'contact_seller' item.id %}">Contact Seller</a></p>
+    {% endif %}
+    <p><a href="{% url 'item_list' %}">Back to Item List</a></p>
+</body>
+</html>

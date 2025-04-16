@@ -1,0 +1,26 @@
+{% extends 'marketplace/base.html' %}
+
+{% block title %}Verify Collection PIN{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Verify Collection PIN</h1>
+    <p>Please enter the verification PIN provided by the buyer or the collection service for Transaction ID: {{ transaction_id }}.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Verify PIN</button>
+    </form>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <p><a href="{% url 'user_dashboard' %}">Back to Dashboard</a></p>
+</div>
+{% endblock %}

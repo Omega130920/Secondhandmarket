@@ -1,0 +1,85 @@
+{% extends 'marketplace/base.html' %}
+
+{% block title %}Process Payment{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Process Payment</h1>
+
+    <div class="item-details">
+        <h2>{{ item.title }}</h2>
+        <p>Price: {{ item.price }}</p>
+        {% if item.description %}
+            <p>Description: {{ item.description }}</p>
+        {% endif %}
+        {% if item.image %}
+            <img src="{{ item.image.url }}" alt="{{ item.title }}" style="max-width: 300px;">
+        {% endif %}
+    </div>
+
+    <div class="payment-options">
+        <h2>Payment Options</h2>
+        <p>Select your preferred payment method:</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Simulate Payment</button>
+            <p class="mt-2 text-muted">Note: This is a simulation. No actual payment will be processed.</p>
+        </form>
+        </div>
+
+    <div class="back-link mt-3">
+        <a href="{% url 'user_dashboard' %}">Back to Dashboard</a>
+    </div>
+</div>
+
+<style>
+    .container {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+    }
+
+    h1, h2 {
+        color: #007bff;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .item-details {
+        margin-bottom: 20px;
+        padding: 15px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        background-color: #fff;
+    }
+
+    .payment-options {
+        padding: 15px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        background-color: #fff;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    .back-link {
+        text-align: center;
+    }
+</style>
+{% endblock %}

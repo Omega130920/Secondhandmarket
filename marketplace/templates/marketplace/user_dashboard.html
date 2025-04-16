@@ -1,0 +1,385 @@
+{% extends 'marketplace/base.html' %}
+
+{% block title %}User Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        margin: 20px;
+        background-color: #f8f9fa;
+        color: #495057;
+    }
+
+    h1 {
+        color: #007bff;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .dashboard-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .dashboard-tabs {
+        display: flex;
+        border-bottom: 1px solid #dee2e6;
+        margin-bottom: 15px;
+    }
+
+    .tab-button {
+        background-color: #e9ecef;
+        color: #495057;
+        border: none;
+        padding: 10px 15px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        border-bottom: 2px solid transparent;
+        margin-right: 5px;
+    }
+
+    .tab-button:hover {
+        background-color: #d3d9df;
+    }
+
+    .tab-button.active {
+        background-color: #fff;
+        color: #007bff;
+        border-bottom: 2px solid #007bff;
+        font-weight: bold;
+    }
+
+    .tab-content {
+        display: none;
+        padding-top: 15px;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    h2 {
+        color: #28a745;
+        margin-top: 15px;
+        border-bottom: 2px solid #28a745;
+        padding-bottom: 8px;
+        font-size: 1.5em;
+    }
+
+    ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    li {
+        margin-bottom: 10px;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        background-color: #fdfdfd;
+    }
+
+    a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    small {
+        color: #6c757d;
+        display: block;
+        margin-top: 5px;
+        font-size: 0.9em;
+    }
+
+    form {
+        display: inline;
+        margin-left: 10px;
+    }
+
+    button[type="submit"] {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9em;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+
+    strong {
+        font-weight: bold;
+    }
+
+    hr {
+        border-top: 1px solid #ced4da;
+        margin: 15px 0;
+    }
+
+    .back-link {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .notification-indicator {
+        display: inline-block;
+        background-color: red;
+        color: white;
+        font-size: 0.7em;
+        border-radius: 50%;
+        padding: 2px 5px;
+        margin-left: 5px;
+        vertical-align: middle;
+    }
+</style>
+<div class="dashboard-container">
+    <h1>User Dashboard</h1>
+
+    <div class="dashboard-tabs">
+        <button class="tab-button {% if unread_notifications_count > 0 %}has-notifications{% endif %} active" onclick="openTab('notifications')">
+            Notifications
+            {% if unread_notifications_count > 0 %}
+            <span class="notification-indicator">{{ unread_notifications_count }}</span>
+            {% endif %}
+        </button>
+        <button class="tab-button {% if unread_messages_count > 0 %}has-notifications{% endif %}" onclick="openTab('messages')">
+            Messages
+            {% if unread_messages_count > 0 %}
+            <span class="notification-indicator">{{ unread_messages_count }}</span>
+            {% endif %}
+        </button>
+        <button class="tab-button {% if awaiting_payment_count > 0 %}has-notifications{% endif %}" onclick="openTab('awaiting_payment')">
+            {% if request.user.is_seller %}Awaiting Action{% else %}Awaiting Payment{% endif %}
+            {% if awaiting_payment_count > 0 %}
+            <span class="notification-indicator">{{ awaiting_payment_count }}</span>
+            {% endif %}
+        </button>
+        <button class="tab-button" onclick="openTab('purchase_history')">
+            {% if request.user.is_seller %}Sales History{% else %}Purchase History{% endif %}
+        </button>
+        <button class="tab-button" onclick="openTab('my_listings')">My Listings</button>
+    </div>
+
+    <div id="notifications" class="tab-content active">
+        <h2>Notifications</h2>
+        {% if notifications %}
+        <ul>
+            {% for notification in notifications %}
+            <li>
+                {% if notification.notification_type == 'buyer_chosen' %}
+                    {% if request.user == notification.recipient and notification.message and notification.message.item %}
+                        You have been chosen as the buyer for
+                        <a href="{% url 'item_detail' notification.message.item.id %}">{{ notification.message.item.title }}</a>
+                        by {{ notification.message.recipient.username }}.
+                    {% elif request.user == notification.message.recipient and notification.message and notification.message.item %}
+                        You chose {{ notification.message.sender.username }} as the buyer for
+                        <a href="{% url 'item_detail' notification.message.item.id %}">{{ notification.message.item.title }}</a>.
+                    {% else %}
+                        {{ notification.notification_type|capfirst }}
+                    {% endif %}
+                {% elif notification.notification_type == 'message_received' and notification.message and notification.message.item %}
+                    You have received a new message regarding
+                    <a href="{% url 'item_detail' notification.message.item.id %}">{{ notification.message.item.title }}</a>
+                    from {{ notification.message.sender.username }}.
+                {% elif notification.notification_type == 'pin_verification_required' and notification.message and notification.message.item and notification.message.transaction_id %}
+                    <strong>Action Required (Seller):</strong> For the sale of
+                    <a href="{% url 'item_detail' notification.message.item.id %}">{{ notification.message.item.title }}</a>,
+                    the buyer has paid. Please enter the verification PIN you received
+                    <a href="{% url 'enter_verification_pin' notification.message.transaction_id %}">here</a>.
+                {% elif notification.notification_type == 'payment_confirmed_pin_sent' %}
+                    {% if request.user == notification.recipient and notification.message and notification.message.item %}
+                        Your payment for
+                        <a href="{% url 'item_detail' notification.message.item.id %}">{{ notification.message.item.title }}</a>
+                        is confirmed. You should have received a verification PIN.
+                    {% elif request.user == notification.message.recipient and notification.message and notification.message.item %}
+                        {{ notification.message.sender.username }} has confirmed payment for
+                        <a href="{% url 'item_detail' notification.message.item.id %}">{{ notification.message.item.title }}</a>.
+                        A verification PIN has been sent to them.
+                    {% else %}
+                        {{ notification.notification_type|capfirst }}
+                    {% endif %}
+                {% elif notification.notification_type == 'pin_verified' %}
+                    {% if request.user == notification.recipient and notification.message and notification.message.item %}
+                        The PIN for your purchase of
+                        <a href="{% url 'item_detail' notification.message.item.id %}">{{ notification.message.item.title }}</a>
+                        has been successfully verified.
+                    {% elif request.user == notification.message.recipient and notification.message and notification.message.item %}
+                        The buyer has successfully verified the PIN for
+                        <a href="{% url 'item_detail' notification.message.item.id %}">{{ notification.message.item.title }}</a>.
+                        Funds will now be processed (simulated).
+                    {% else %}
+                        {{ notification.notification_type|capfirst }}
+                    {% endif %}
+                {% else %}
+                    {{ notification.notification_type|capfirst }}
+                {% endif %}
+                <small>({{ notification.created_at|timesince }} ago)</small>
+                {% if not notification.is_read %}
+                <form method="post" action="{% url 'mark_notification_as_read' notification.id %}">
+                    {% csrf_token %}
+                    <button type="submit">Mark as Read</button>
+                </form>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No notifications yet.</p>
+        {% endif %}
+    </div>
+
+    <div id="messages" class="tab-content">
+        <h2>Received Messages</h2>
+        {% if received_messages_with_cancellation_status %}
+        <ul>
+            {% for item in received_messages_with_cancellation_status %}
+            {% with message=item.message %}
+            <li style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; border-radius: 5px;">
+                <strong style="display: block; margin-bottom: 5px;">From:</strong> {{ message.sender.username }}<br>
+                <strong style="display: block; margin-bottom: 5px;">Subject:</strong> {{ message.subject }}<br>
+                <strong style="display: block; margin-bottom: 5px;">Regarding Item:</strong> <a href="{% url 'item_detail' message.item.id %}" style="color: #007bff; text-decoration: none;">{{ message.item.title }}</a><br>
+                <strong style="display: block; margin-bottom: 5px;">Sent at:</strong> {{ message.sent_at }}<br>
+                <strong style="display: block; margin-bottom: 5px;">Message:</strong>
+                {% if "verify collection pin" in message.subject|lower and message.item.itemtransaction_set.first.pin_verified %}
+                    The buyer has completed payment for "{{ message.item.title }}" (Transaction ID: {{ message.item.itemtransaction_set.first.transaction_id }}) and PIN has been verified.
+                {% elif "verify collection pin" in message.subject|lower %}
+                    {{ message.body|linebreaksbr|urlize }}
+                {% elif item.buyer_cancelled %}
+                    <strong>Buyer Cancelled:</strong> The buyer {{ message.sender.username }} has cancelled their purchase for this item. You can now choose another buyer.
+                {% else %}
+                    {{ message.body|linebreaksbr|urlize }}
+                {% endif %}
+                <br>
+                <strong style="display: block; margin-bottom: 5px;">Status:</strong> {% if message.is_read %}Read{% else %}<strong>Unread</strong>{% endif %}
+                <form method="post" action="{% url 'mark_as_read' message.id %}" style="margin-top: 10px;">
+                    {% csrf_token %}
+                    <button type="submit" class="{% if message.is_read %}btn-secondary{% else %}btn-primary{% endif %} btn-sm">Mark as Read</button>
+                </form>
+                {% if not message.is_accepted and request.user == message.recipient and message.item and message.item.seller == request.user and not "payment" in message.subject|lower and not "pin" in message.subject|lower %}
+                    <form method="post" action="{% url 'choose_buyer' message.id %}" style="margin-top: 10px;">
+                        {% csrf_token %}
+                        <button type="submit" style="background-color: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 3px; cursor: pointer;">Choose Buyer</button>
+                    </form>
+                {% elif message.is_accepted %}
+                    <strong style="display: block; margin-top: 10px; margin-bottom: 5px;">Status:</strong> Buyer Chosen
+                    {% if message.sender == request.user and not message.payment_processed %}
+                        <a href="{% url 'process_payment' message.item.id %}" class="btn btn-success btn-sm" style="margin-top: 10px;">Continue to Payment</a>
+                    {% endif %}
+                {% endif %}
+               <hr style="margin-top: 15px; border-top: 1px solid #eee;">
+            </li>
+            {% endwith %}
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No messages received yet.</p>
+        {% endif %}
+    </div>
+
+    <div id="awaiting_payment" class="tab-content">
+        <h2>{% if request.user.is_seller %}Action Required - Awaiting Buyer Payment{% else %}Items Awaiting Your Payment{% endif %}</h2>
+        {% if items_to_pay %}
+        <ul>
+            {% for item_data in items_to_pay %}
+            <li>
+                <h3>{{ item_data.item.title }}</h3>
+                <p>Price: {{ item_data.item.price }}</p>
+                {% for message in item_data.messages %}
+                    {% if request.user.is_seller %}
+                        <p>Awaiting payment from {{ message.sender.username }}.</p>
+                    {% else %}
+                        <a href="{% url 'process_payment' item_data.item.id %}">Continue to Payment</a>
+                        <form method="post" action="{% url 'cancel_purchase' item_data.item.id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" style="background-color: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 3px; cursor: pointer; margin-left: 10px;">Cancel Purchase</button>
+                        </form>
+                    {% endif %}
+                {% empty %}
+                    <p>No relevant payment information found for this item.</p>
+                {% endfor %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>{% if request.user.is_seller %}No items are currently awaiting buyer payment.{% else %}No items are currently awaiting your payment.{% endif %}</p>
+        {% endif %}
+    </div>
+
+    <div id="purchase_history" class="tab-content">
+        <h2>{% if request.user.is_seller %}Sales History{% else %}Purchase History{% endif %}</h2>
+        {% if purchase_history %}
+        <ul>
+            {% for transaction in purchase_history %}
+            <li>
+                <h3>{{ transaction.item.title }}</h3>
+                <p>Price: {{ transaction.item.price }}</p>
+                <p>
+                    {% if request.user.is_seller %}
+                        Sold to: {{ transaction.buyer.username }}
+                    {% else %}
+                        Purchased from: {{ transaction.seller.username }}
+                    {% endif %}
+                </p>
+                <p>Transaction ID: {{ transaction.transaction_id }}</p>
+                <p>Payment Date: {{ transaction.payment_timestamp }}</p>
+                <p>PIN Verified: {% if transaction.pin_verified %}Yes{% else %}No{% endif %}</p>
+                <a href="{% url 'item_detail' transaction.item.id %}">View Details</a>
+                <hr>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>{% if request.user.is_seller %}No items sold yet.{% else %}No items purchased yet.{% endif %}</p>
+        {% endif %}
+    </div>
+
+    <div id="my_listings" class="tab-content">
+        <h2>My Listings</h2>
+        {% if my_listings %}
+        <ul>
+            {% for item in my_listings %}
+            <li>
+                <h3>{{ item.title }}</h3>
+                <p>Price: {{ item.price }}</p>
+                <p>Status: {{ item.get_condition_display }}</p>
+                <a href="{% url 'edit_item' item.id %}">Edit</a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>You haven't listed any items yet.</p>
+        {% endif %}
+    </div>
+
+    <p class="back-link"><a href="{% url 'home' %}">Back to Home</a></p>
+</div>
+
+<script>
+    function openTab(tabName) {
+        var i, tabContent, tabButtons;
+        tabContent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabContent.length; i++) {
+            tabContent[i].style.display = "none";
+        }
+        tabButtons = document.getElementsByClassName("tab-button");
+        for (i = 0; i < tabButtons.length; i++) {
+            tabButtons[i].className = tabButtons[i].className.replace(" active", "");
+        }
+        document.getElementById(tabName).style.display = "block";
+        event.currentTarget.className += " active";
+    }
+</script>
+{% endblock %}

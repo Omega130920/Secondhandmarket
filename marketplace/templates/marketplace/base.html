@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}My Second-Hand Market{% endblock %}</title>
+    <style>
+        /* Your global styles can go here */
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+        /* Add more global styles as needed */
+    </style>
+</head>
+<body>
+    <nav>
+        {% if user.is_authenticated %}
+            <p><a href="{% url 'user_dashboard' %}">My Dashboard</a></p>
+            <p><a href="{% url 'logout' %}">Logout</a></p>
+        {% else %}
+            <p><a href="{% url 'register' %}">Register</a></p>
+            <p><a href="{% url 'login' %}">Login</a></p>
+        {% endif %}
+        <p><a href="{% url 'home' %}">Home</a></p>
+        <p><a href="{% url 'item_list' %}">View Listings</a></p>
+        <hr>
+    </nav>
+
+    <div class="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <footer>
+        <hr>
+        <p>&copy; My Second-Hand Market</p>
+    </footer>
+</body>
+</html>

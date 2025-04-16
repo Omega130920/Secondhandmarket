@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Contact Seller for {{ item.title }}</title>
+</head>
+<body>
+    <h1>Contact Seller for {{ item.title }}</h1>
+    <p>You are contacting: {{ seller.username }}</p>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Send Message</button>
+    </form>
+    <p><a href="{% url 'item_detail' item.id %}">Back to Item Details</a></p>
+</body>
+</html>
