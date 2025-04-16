@@ -34,7 +34,8 @@
         input[type="text"],
         input[type="email"],
         input[type="password"],
-        input[type="file"] {
+        input[type="file"],
+        textarea { /* Added style for textarea */
             width: 100%;
             padding: 10px;
             margin-bottom: 15px;
@@ -112,6 +113,13 @@
         <p><label for="{{ form.id_document.id_for_label }}">{{ form.id_document.label }}</label> {{ form.id_document }}</p>
         <p><label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label> {{ form.password }}</p>
         <p><label for="{{ form.password_confirm.id_for_label }}">{{ form.password_confirm.label }}</label> {{ form.password_confirm }}</p>
+
+        {# New address fields in the template #}
+        <p><label for="{{ form.region.id_for_label }}">{{ form.region.label }}</label> {{ form.region }} {{ form.region.errors }}</p>
+        <p><label for="{{ form.suburb.id_for_label }}">{{ form.suburb.label }}</label> {{ form.suburb }} {{ form.suburb.errors }}</p>
+        <p><label for="{{ form.street_address.id_for_label }}">{{ form.street_address.label }}</label> {{ form.street_address }} {{ form.street_address.errors }}</p>
+        <p><label for="{{ form.postal_code.id_for_label }}">{{ form.postal_code.label }}</label> {{ form.postal_code }} {{ form.postal_code.errors }}</p>
+
         <button type="submit">Register</button>
     </form>
     <p>Already have an account? <a href="{% url 'login' %}">Log in</a></p>

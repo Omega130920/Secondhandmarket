@@ -21,6 +21,12 @@ class UserProfile(models.Model):
     )
     id_document = models.ImageField(upload_to='id_documents/', null=True, blank=True)
 
+    # New address fields
+    region = models.CharField(max_length=100, blank=True)
+    suburb = models.CharField(max_length=100, blank=True)
+    street_address = models.CharField(max_length=255, blank=True)
+    postal_code = models.CharField(max_length=10, blank=True)
+
     def __str__(self):
         return self.user.username
 

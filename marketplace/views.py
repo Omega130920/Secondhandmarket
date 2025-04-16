@@ -220,13 +220,12 @@ def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            # Log the user in automatically after registration (optional)
+            user = form.save() # The save method in the form now handles UserProfile creation
             login(request, user)
-            return redirect('home')  # Redirect to your homepage
+            return redirect('some_success_url') # Redirect to a success page
     else:
         form = UserRegistrationForm()
-    return render(request, 'marketplace/register.html', {'form': form})
+    return render(request, 'registration.html', {'form': form})
 
 def home(request):
     return render(request, 'marketplace/home.html')
