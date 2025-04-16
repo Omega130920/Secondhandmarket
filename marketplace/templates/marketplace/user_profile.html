@@ -15,6 +15,8 @@
         .rejected { background-color: #dc3545; color: #fff; }
         .edit-link { display: block; margin-top: 20px; text-align: center; color: #007bff; text-decoration: none; }
         .edit-link:hover { text-decoration: underline; }
+        .home-link { display: block; margin-top: 20px; text-align: center; color: #007bff; text-decoration: none; }
+        .home-link:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -87,6 +89,7 @@
             {% endif %}
 
             <a href="{% url 'edit_profile' %}" class="edit-link">Edit Profile</a>
+            <a href="{% url 'home' %}" class="home-link">Return to Home</a>
         {% else %}
             <p>No profile information available.</p>
             <a href="{% url 'edit_profile' %}" class="edit-link">Create Profile</a>
