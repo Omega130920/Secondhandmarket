@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Second Hand Market</title>
     <style>
         body {
@@ -23,111 +25,269 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             margin-top: 40px;
             width: 100%;
+            box-sizing: border-box;
         }
 
-        h1 {
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
             color: #007bff;
-            text-align: center;
-            margin-bottom: 30px; /* Increased bottom margin */
-            font-size: 2.8em; /* Increased font size */
+            font-size: 2.8em;
+            margin-bottom: 10px;
         }
 
-        p {
+        header p {
             color: #555;
-            margin-bottom: 20px; /* Increased bottom margin */
-            text-align: center;
-            font-size: 1.15em; /* Increased font size */
+            font-size: 1.15em;
+            margin-bottom: 0;
         }
 
-        a {
+        nav {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        nav ul li {
+            margin: 0;
+        }
+
+        nav ul li a {
             color: #007bff;
             text-decoration: none;
             font-weight: 500;
-            font-size: 1.1em; /* Increased font size */
+            font-size: 1.1em;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        a:hover {
-            text-decoration: underline;
-            color: #0056b3;
+        nav ul li a:hover {
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
         }
 
-        ul {
+        main {
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        main h2 {
+            color: #28a745;
+            font-size: 2em;
+            margin-top: 35px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #28a745;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+
+        main ul {
             list-style: none;
             padding: 0;
-            margin-top: 25px; /* Increased top margin */
-            text-align: center;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center; /* Center the boxes */
+            gap: 20px; /* Space between boxes */
         }
 
-        ul li {
-            margin-bottom: 15px; /* Increased bottom margin */
+        main ul li {
+            margin-bottom: 0; /* Remove default bottom margin */
+            text-align: center;
+            width: calc(33.33% - 20px); /* 3 boxes per row, minus gap */
+            min-width: 200px; /* Ensure a minimum width */
+            box-sizing: border-box;
         }
 
-        h2 {
-            color: #28a745;
-            font-size: 2em; /* Increased font size */
-            margin-top: 35px; /* Increased top margin */
-            margin-bottom: 20px; /* Increased bottom margin */
-            border-bottom: 2px solid #28a745;
-            padding-bottom: 10px; /* Increased padding */
-            text-align: center;
+        main ul li a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            text-decoration: none;
+            color: #333;
+            height: 100%; /* Make sure the container takes full height */
+            box-sizing: border-box;
+        }
+
+        main ul li a:hover {
+            background-color: #007bff;
+            color: #fff;
+            border-color: #007bff;
+            transform: translateY(-5px);
+        }
+
+        main ul li a i { /* Style for the icon */
+            font-size: 2em; /* Large icon size */
+            margin-bottom: 10px; /* Space between icon and text */
+            color: #007bff; /* Icon color */
+        }
+
+        main ul li a:hover i {
+            color: #fff; /* Change icon color on hover */
         }
 
         .account-section {
-            margin-top: 40px; /* Increased top margin */
-            padding: 25px; /* Increased padding */
+            margin-top: 40px;
+            padding: 25px;
             background-color: #f9f9f9;
             border: 1px solid #eee;
             border-radius: 6px;
             text-align: center;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+
+        .account-section h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #28a745;
         }
 
         .account-section ul {
-            margin-top: 20px; /* Increased top margin */
+            margin-top: 20px;
+            padding: 0;
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
         }
 
-        .account-section li {
-            margin-bottom: 12px; /* Increased bottom margin */
+        .account-section ul li {
+            margin-bottom: 0;
+            width: calc(33.33% - 20px);
+            min-width: 200px;
+            box-sizing: border-box;
+        }
+
+        .account-section ul li a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            text-decoration: none;
+            color: #333;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .account-section ul li a:hover {
+            background-color: #007bff;
+            color: #fff;
+            border-color: #007bff;
+            transform: translateY(-5px);
+        }
+
+        .account-section ul li a i {
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: #007bff;
+        }
+
+        .account-section ul li a:hover i {
+            color: #fff;
+        }
+
+
+        .auth-links {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .auth-links a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1em;
+            margin: 0 10px;
+        }
+
+        .auth-links a:hover {
+            text-decoration: underline;
+            color: #0056b3;
+        }
+
+        .greeting {
+            text-align: center;
+            font-size: 1.2em;
+            color: #28a745;
+            margin-bottom: 20px;
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
     <div class="container">
-        <h1>Welcome to the Re-Rack!</h1>
-        <p>Browse and sell your second-hand goods.</p>
+        <header>
+            <h1>Welcome to the Re-Rack!</h1>
+            <p>Browse and sell your second-hand goods.</p>
+        </header>
 
-        {% if not user.is_authenticated %}
-            <p><a href="{% url 'register' %}">Register</a> | <a href="{% url 'login' %}">Log in</a></p>
-        {% endif %}
+        <nav>
+            {% if not user.is_authenticated %}
+                <div class="auth-links">
+                    <a href="{% url 'register' %}">Register</a> | <a href="{% url 'login' %}">Log in</a>
+                </div>
+            {% endif %}
+        </nav>
 
-        {% if user.is_authenticated %}
-            <p>
-                Welcome,
-                {% if user.first_name %}
-                    {{ user.first_name }}
-                {% elif user.username %}
-                    {{ user.username }}
-                {% else %}
-                    User
-                {% endif %}!
-            </p>
-        {% endif %}
+        <main>
+            {% if user.is_authenticated %}
+                <p class="greeting">
+                    Welcome,
+                    {% if user.first_name %}
+                        {{ user.first_name }}
+                    {% elif user.username %}
+                        {{ user.username }}
+                    {% else %}
+                        User
+                    {% endif %}!
+                </p>
 
-        <h2>Browse Items</h2>
-        <ul>
-            <li><a href="{% url 'item_list' %}">View All Items</a></li>
-            {# Add more browsing links here if needed #}
-        </ul>
-
-        {% if user.is_authenticated %}
-            <div class="account-section">
-                <h2>Your Account</h2>
+                <h2>Browse Items</h2>
                 <ul>
-                    <li><a href="{% url 'user_dashboard' %}">Go to Dashboard</a></li>
-                    <li><a href="{% url 'list_item' %}">List a New Item</a></li>
-                    <li><a href="{% url 'logout' %}">Log out</a></li>
+                    <li><a href="{% url 'item_list' %}"><i class="fas fa-list"></i> View All Items</a></li>
+                    {# Add more browsing links here if needed #}
                 </ul>
-            </div>
-        {% endif %}
+
+                <section class="account-section">
+                    <h2>Your Account</h2>
+                    <ul>
+                        <li><a href="{% url 'user_dashboard' %}"><i class="fas fa-tachometer-alt"></i> Go to Dashboard</a></li>
+                        <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i> View Your Profile</a></li>
+                        <li><a href="{% url 'profile_edit' %}"><i class="fas fa-edit"></i> Edit Your Profile</a></li>
+                        <li><a href="{% url 'list_item' %}"><i class="fas fa-plus-circle"></i> List a New Item</a></li>
+                        <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Log out</a></li>
+                    </ul>
+                </section>
+            {% endif %}
+        </main>
     </div>
 </body>
 </html>
