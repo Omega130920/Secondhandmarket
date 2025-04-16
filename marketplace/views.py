@@ -5,8 +5,8 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
-from .forms import UserRegistrationForm, PinVerificationForm, ItemForm, ContactSellerForm
-from .models import Item, Notification, Message, ItemTransaction
+from .forms import UserRegistrationForm, PinVerificationForm, ItemForm, ContactSellerForm, EditProfileForm
+from .models import Item, Notification, Message, ItemTransaction, UserProfile
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.conf import settings
@@ -307,6 +307,12 @@ def generate_random_pin(length=6):
     characters = string.digits
     return ''.join(random.choice(characters) for _ in range(length))
 
+TEMP_REGISTRATION_DATA = {}
+
+TEMP_REGISTRATION_DATA = {}
+
+TEMP_REGISTRATION_DATA = {}
+
 def register_user(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST, request.FILES)
@@ -317,10 +323,11 @@ def register_user(request):
             cell_phone = form.cleaned_data['cell_phone']
             id_document = request.FILES['id_document']
             password = form.cleaned_data['password']
-
-            if User.objects.filter(email=email).exists():
-                messages.error(request, "An account with this email address already exists.")
-                return render(request, 'marketplace/register.html', {'form': form})
+            region = form.cleaned_data['region']
+            suburb = form.cleaned_data['suburb']
+            street_address = form.cleaned_data['street_address']
+            postal_code = form.cleaned_data['postal_code']
+            username = form.cleaned_data['username']  # Get the username
 
             pin = generate_random_pin()
 
@@ -332,66 +339,69 @@ def register_user(request):
                 'id_document_content': id_document.read(),
                 'password': password,
                 'pin': pin,
-                'pin_expiry': timezone.now() + timezone.timedelta(minutes=10)
+                'pin_expiry': timezone.now() + timezone.timedelta(minutes=10),
+                'region': region,
+                'suburb': suburb,
+                'street_address': street_address,
+                'postal_code': postal_code,
+                'username': username,  # Store the username
             }
 
-            subject = 'Your Account Verification PIN'
-            message = f'Your PIN is: {pin}. This PIN will expire in 10 minutes.'
-            from_email = settings.DEFAULT_FROM_EMAIL
-            recipient_list = [email]
-            send_mail(subject, message, from_email, recipient_list)
+            # --- TEMPORARY: Print the PIN to the terminal for testing ---
+            print(f"Generated PIN for {email}: {pin}")
 
-            # Store the email in the session to use in the verify_pin view
+            # subject = 'Your Account Verification PIN'
+            # message = f'Your PIN is: {pin}. This PIN will expire in 10 minutes.'
+            # from_email = settings.DEFAULT_FROM_EMAIL
+            # recipient_list = [email]
+            # send_mail(subject, message, from_email, recipient_list)
+
             request.session['registration_email'] = email
-
             return redirect('verify_pin')
     else:
         form = UserRegistrationForm()
     return render(request, 'marketplace/register.html', {'form': form})
 
+TEMP_REGISTRATION_DATA = {}
+
 def verify_pin(request):
+    registration_email = request.session.get('registration_email')
+    if not registration_email or registration_email not in TEMP_REGISTRATION_DATA:
+        messages.error(request, "Invalid or expired registration attempt.")
+        return redirect('register')
+
     if request.method == 'POST':
-        form = PinVerificationForm(request.POST)
-        if form.is_valid():
-            pin_submitted = form.cleaned_data['pin']
-            email = request.session.get('registration_email') # We need to store this in session
+        pin_entered = request.POST.get('pin')
+        stored_data = TEMP_REGISTRATION_DATA.get(registration_email)
 
-            if email in TEMP_REGISTRATION_DATA:
-                registration_data = TEMP_REGISTRATION_DATA[email]
-                if timezone.now() < registration_data['pin_expiry'] and pin_submitted == registration_data['pin']:
-                    # Create the user
-                    user = User.objects.create_user(
-                        username=email.split('@')[0],  # Basic username
-                        email=email,
-                        password=registration_data['password'],
-                        first_name=registration_data['first_name'],
-                        last_name=registration_data['last_name']
-                    )
-                    # Here you would also save the cell phone and ID document
-                    # For now, let's just print them
-                    print(f"Cell Phone: {registration_data['cell_phone']}")
-                    print(f"ID Document Name: {registration_data['id_document_name']}")
-                    # In a real app, save the ID document to MEDIA_ROOT
+        if stored_data and pin_entered == stored_data['pin'] and timezone.now() < stored_data['pin_expiry']:
+            # Create the user and user profile
+            user = User.objects.create_user(
+                username=stored_data['username'],  # Use the stored username
+                first_name=stored_data['first_name'],
+                last_name=stored_data['last_name'],
+                email=registration_email,
+                password=stored_data['password']
+            )
+            UserProfile.objects.create(
+                user=user,
+                contact_number=stored_data['cell_phone'],
+                id_document=None,
+                region=stored_data.get('region', ''),
+                suburb=stored_data.get('suburb', ''),
+                street_address=stored_data.get('street_address', ''),
+                postal_code=stored_data.get('postal_code', '')
+            )
 
-                    messages.success(request, "Registration successful! You can now log in.")
-                    del TEMP_REGISTRATION_DATA[email] # Clean up temporary data
-                    return redirect('login')
-                else:
-                    messages.error(request, "Invalid or expired PIN.")
-            else:
-                messages.error(request, "No registration data found for this email.")
+            del TEMP_REGISTRATION_DATA[registration_email]
+            messages.success(request, "Registration successful! Please log in.")
+            return redirect('login')
+        else:
+            messages.error(request, "Invalid or expired PIN. Please try again.")
+            return render(request, 'marketplace/verify_pin.html')
     else:
-        form = PinVerificationForm()
-        # We need to get the email from the previous step to associate the PIN
-        # For now, we'll just render the form. We'll refine this flow later.
-        # A better approach might be to pass the email in the redirect or use session.
-        email_in_session = request.session.get('registration_email')
-        return render(request, 'marketplace/verify_pin.html', {'form': form, 'email': email_in_session})
-
-    # If POST fails or PIN is invalid, re-render the form
-    email_in_session = request.session.get('registration_email')
-    return render(request, 'marketplace/verify_pin.html', {'form': form, 'email': email_in_session})
-
+        return render(request, 'marketplace/verify_pin.html')
+    
 @login_required
 def process_payment(request, item_id):
     item = get_object_or_404(Item, id=item_id)
@@ -658,3 +668,38 @@ def cancel_purchase(request, item_id):
     else:
         messages.error(request, "You are not the chosen buyer for this item or the purchase cannot be cancelled at this stage.")
         return redirect('user_dashboard')
+    
+@login_required
+def user_profile(request):
+    try:
+        user_profile = UserProfile.objects.get(user=request.user)
+    except UserProfile.DoesNotExist:
+        # Handle the case where a profile doesn't exist for the user
+        # This might happen if you haven't created profiles for existing users
+        user_profile = None  # Or you could create a default profile here
+
+    return render(request, 'marketplace/user_profile.html', {'user_profile': user_profile})
+
+@login_required
+def edit_profile(request):
+    try:
+        user_profile = UserProfile.objects.get(user=request.user)
+    except UserProfile.DoesNotExist:
+        user_profile = UserProfile(user=request.user) # Create a new one if it doesn't exist
+
+    if request.method == 'POST':
+        form = EditProfileForm(request.POST, instance=user_profile)
+        if form.is_valid():
+            user = request.user
+            user.first_name = form.cleaned_data['first_name']
+            user.last_name = form.cleaned_data['last_name']
+            user.save()
+            form.save() # Saves the UserProfile instance
+            messages.success(request, 'Your profile has been updated successfully.')
+            return redirect('user_profile')
+        else:
+            messages.error(request, 'There was an error updating your profile.')
+    else:
+        form = EditProfileForm(instance=user_profile)
+
+    return render(request, 'marketplace/edit_profile.html', {'form': form})

@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django import forms
+from django.core.exceptions import ValidationError
 from .models import Item, Category, UserProfile
 
 class ItemForm(forms.ModelForm):
@@ -46,54 +47,55 @@ class ItemForm(forms.ModelForm):
         return instance
 
 class UserRegistrationForm(forms.Form):
-    first_name = forms.CharField(max_length=30, label='First Name')
-    last_name = forms.CharField(max_length=30, label='Last Name')
-    email = forms.EmailField(label='Email Address')
-    cell_phone = forms.CharField(max_length=15, label='Cell Phone Number')
-    id_document = forms.FileField(
-        label='Upload ID Document (Word or PDF)',
-        required=True,
-        widget=forms.FileInput(attrs={'accept': '.doc,.docx,.pdf'})
-    )
-    password = forms.CharField(widget=forms.PasswordInput, label='Password')
-    password_confirm = forms.CharField(widget=forms.PasswordInput, label='Confirm Password')
+                first_name = forms.CharField(max_length=30, label='First Name')
+                last_name = forms.CharField(max_length=30, label='Last Name')
+                email = forms.EmailField(label='Email Address')
+                cell_phone = forms.CharField(max_length=15, label='Cell Phone Number')
+                id_document = forms.FileField(
+                    label='Upload ID Document (Word or PDF)',
+                    required=True,
+                    widget=forms.FileInput(attrs={'accept': '.doc,.docx,.pdf'})
+                )
+                password = forms.CharField(widget=forms.PasswordInput, label='Password')
+                password_confirm = forms.CharField(widget=forms.PasswordInput, label='Confirm Password')  # Ensure this line is present
 
-    # New address fields in the form
-    region = forms.CharField(max_length=100, label='Region', required=False)
-    suburb = forms.CharField(max_length=100, label='Suburb', required=False)
-    street_address = forms.CharField(widget=forms.TextInput, max_length=255, label='Street Address', required=False)
-    postal_code = forms.CharField(max_length=10, label='Postal Code', required=False)
+                # New address fields in the form
+                region = forms.CharField(max_length=100, label='Region', required=False)
+                suburb = forms.CharField(max_length=100, label='Suburb', required=False)
+                street_address = forms.CharField(widget=forms.TextInput, max_length=255, label='Street Address', required=False)
+                postal_code = forms.CharField(max_length=10, label='Postal Code', required=False)
 
-    def clean(self):
-        cleaned_data = super().clean()
-        password = cleaned_data.get("password")
-        password_confirm = cleaned_data.get("password_confirm")
+                def clean(self):
+                    cleaned_data = super().clean()
+                    password = cleaned_data.get("password")
+                    password_confirm = cleaned_data.get("password_confirm")
 
-        if password and password_confirm and password != password_confirm:
-            raise forms.ValidationError("Passwords do not match.")
+                    if password and password_confirm and password != password_confirm:
+                        raise forms.ValidationError("Passwords do not match.")
 
-        return cleaned_data
+                    return cleaned_data
 
-    def save(self, commit=True):
-        user = User.objects.create_user(
-            username=self.cleaned_data['email'],  # Use email as username
-            first_name=self.cleaned_data['first_name'],
-            last_name=self.cleaned_data['last_name'],
-            email=self.cleaned_data['email'],
-            password=self.cleaned_data['password']
-        )
-        user.save()
+                def save(self, commit=True):
+                    user = User.objects.create_user(
+                        username=self.cleaned_data['email'],  # Use email as username
+                        first_name=self.cleaned_data['first_name'],
+                        last_name=self.cleaned_data['last_name'],
+                        email=self.cleaned_data['email'],
+                        password=self.cleaned_data['password']
+                    )
+                    user.save()
 
-        profile = UserProfile.objects.create(user=user)
-        profile.contact_number = self.cleaned_data['cell_phone']
-        profile.id_document = self.cleaned_data['id_document']
-        profile.region = self.cleaned_data['region']
-        profile.suburb = self.cleaned_data['suburb']
-        profile.street_address = self.cleaned_data['street_address']
-        profile.postal_code = self.cleaned_data['postal_code']
-        profile.save()
+                    profile = UserProfile.objects.create(user=user)
+                    profile.contact_number = self.cleaned_data['cell_phone']
+                    profile.id_document = self.cleaned_data['id_document']
+                    profile.region = self.cleaned_data['region']
+                    profile.suburb = self.cleaned_data['suburb']
+                    profile.street_address = self.cleaned_data['street_address']
+                    profile.postal_code = self.cleaned_data['postal_code']
+                    profile.save()
 
-        return user
+                    return user
+
     
 class PinVerificationForm(forms.Form):
     pin = forms.CharField(max_length=6, label='Enter PIN')
@@ -118,3 +120,24 @@ class ContactSellerForm(forms.Form):
     
 class VerificationPinForm(forms.Form):
     verification_pin = forms.CharField(max_length=6, label='Verification PIN')
+    
+class EditProfileForm(forms.ModelForm):
+    first_name = forms.CharField(max_length=30, required=False)
+    last_name = forms.CharField(max_length=150, required=False)
+    contact_number = forms.CharField(max_length=20, required=False)
+    display_name = forms.CharField(max_length=255, required=False)
+    region = forms.CharField(max_length=100, required=False)
+    suburb = forms.CharField(max_length=100, required=False)
+    street_address = forms.CharField(max_length=255, required=False)
+    postal_code = forms.CharField(max_length=10, required=False)
+
+    class Meta:
+        model = UserProfile
+        fields = ['display_name', 'contact_number', 'region', 'suburb', 'street_address', 'postal_code']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'instance' in kwargs and kwargs['instance']:
+            user = kwargs['instance'].user
+            self.fields['first_name'].initial = user.first_name
+            self.fields['last_name'].initial = user.last_name

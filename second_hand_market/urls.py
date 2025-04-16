@@ -24,6 +24,8 @@ urlpatterns = [
     path('messages/<int:message_id>/choose/', views.choose_buyer, name='choose_buyer'),
     path('notifications/<int:notification_id>/read/', views.mark_notification_as_read, name='mark_notification_as_read'),
     path('payment/<int:item_id>/', views.process_payment, name='process_payment'),
+    path('profile/', views.user_profile, name='user_profile'), # Add this line
+    path('profile/edit/', views.edit_profile, name='edit_profile'), # Add this line
     
     # Newly added URLs for the simulated payment workflow
     path('message/<int:message_id>/confirm_payment/', views.buyer_confirms_payment, name='confirm_payment'),

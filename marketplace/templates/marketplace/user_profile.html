@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Profile</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f8f9fa; color: #495057; }
+        h1 { color: #007bff; text-align: center; margin-bottom: 30px; }
+        .profile-info { max-width: 600px; margin: 0 auto; background-color: #fff; padding: 20px; border: 1px solid #dee2e6; border-radius: 5px; }
+        .info-item { margin-bottom: 15px; }
+        .info-label { font-weight: bold; display: block; margin-bottom: 5px; color: #343a40; }
+        .info-value { display: block; color: #212529; }
+        .verification-badge { display: inline-block; padding: 5px 10px; border-radius: 5px; font-size: 0.9em; }
+        .pending { background-color: #ffc107; color: #212529; }
+        .approved { background-color: #28a745; color: #fff; }
+        .rejected { background-color: #dc3545; color: #fff; }
+        .edit-link { display: block; margin-top: 20px; text-align: center; color: #007bff; text-decoration: none; }
+        .edit-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>User Profile</h1>
+    <div class="profile-info">
+        {% if user_profile %}
+            <div class="info-item">
+                <span class="info-label">Username:</span>
+                <span class="info-value">{{ user.username }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">First Name:</span>
+                <span class="info-value">{{ user.first_name }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Last Name:</span>
+                <span class="info-value">{{ user.last_name }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Email:</span>
+                <span class="info-value">{{ user.email }}</span>
+            </div>
+            {% if user_profile.display_name %}
+                <div class="info-item">
+                    <span class="info-label">Display Name:</span>
+                    <span class="info-value">{{ user_profile.display_name }}</span>
+                </div>
+            {% endif %}
+            {% if user_profile.contact_number %}
+                <div class="info-item">
+                    <span class="info-label">Contact Number:</span>
+                    <span class="info-value">{{ user_profile.contact_number }}</span>
+                </div>
+            {% endif %}
+            <div class="info-item">
+                <span class="info-label">Verification Status:</span>
+                {% if user_profile.verification_status == 'pending' %}
+                    <span class="info-value verification-badge pending">Pending</span>
+                {% elif user_profile.verification_status == 'approved' %}
+                    <span class="info-value verification-badge approved">Approved</span>
+                {% elif user_profile.verification_status == 'rejected' %}
+                    <span class="info-value verification-badge rejected">Rejected</span>
+                {% else %}
+                    <span class="info-value">{{ user_profile.verification_status }}</span>
+                {% endif %}
+            </div>
+            {% if user_profile.region %}
+                <div class="info-item">
+                    <span class="info-label">Region:</span>
+                    <span class="info-value">{{ user_profile.region }}</span>
+                </div>
+            {% endif %}
+            {% if user_profile.suburb %}
+                <div class="info-item">
+                    <span class="info-label">Suburb:</span>
+                    <span class="info-value">{{ user_profile.suburb }}</span>
+                </div>
+            {% endif %}
+            {% if user_profile.street_address %}
+                <div class="info-item">
+                    <span class="info-label">Street Address:</span>
+                    <span class="info-value">{{ user_profile.street_address }}</span>
+                </div>
+            {% endif %}
+            {% if user_profile.postal_code %}
+                <div class="info-item">
+                    <span class="info-label">Postal Code:</span>
+                    <span class="info-value">{{ user_profile.postal_code }}</span>
+                </div>
+            {% endif %}
+
+            <a href="{% url 'edit_profile' %}" class="edit-link">Edit Profile</a>
+        {% else %}
+            <p>No profile information available.</p>
+            <a href="{% url 'edit_profile' %}" class="edit-link">Create Profile</a>
+        {% endif %}
+    </div>
+</body>
+</html>

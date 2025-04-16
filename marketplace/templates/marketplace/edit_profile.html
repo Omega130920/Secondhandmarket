@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Profile</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f8f9fa; color: #495057; }
+        h1 { color: #007bff; text-align: center; margin-bottom: 30px; }
+        .edit-profile-form { max-width: 600px; margin: 0 auto; background-color: #fff; padding: 20px; border: 1px solid #dee2e6; border-radius: 5px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #343a40; }
+        input[type="text"], input[type="email"] { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button[type="submit"] { background-color: #28a745; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 1em; }
+        button[type="submit"]:hover { background-color: #218838; }
+        .errorlist { color: red; margin-top: 5px; }
+        .messages { list-style-type: none; padding: 0; margin-bottom: 15px; }
+        .messages li { padding: 10px; border-radius: 4px; margin-bottom: 5px; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .back-link { display: block; margin-top: 20px; text-align: center; color: #007bff; text-decoration: none; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>Edit Your Profile</h1>
+    <div class="edit-profile-form">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.first_name.errors }}
+                <label for="{{ form.first_name.id_for_label }}">First Name:</label>
+                {{ form.first_name }}
+            </div>
+            <div class="form-group">
+                {{ form.last_name.errors }}
+                <label for="{{ form.last_name.id_for_label }}">Last Name:</label>
+                {{ form.last_name }}
+            </div>
+            <div class="form-group">
+                {{ form.display_name.errors }}
+                <label for="{{ form.display_name.id_for_label }}">Display Name:</label>
+                {{ form.display_name }}
+            </div>
+            <div class="form-group">
+                {{ form.contact_number.errors }}
+                <label for="{{ form.contact_number.id_for_label }}">Contact Number:</label>
+                {{ form.contact_number }}
+            </div>
+            <div class="form-group">
+                {{ form.region.errors }}
+                <label for="{{ form.region.id_for_label }}">Region:</label>
+                {{ form.region }}
+            </div>
+            <div class="form-group">
+                {{ form.suburb.errors }}
+                <label for="{{ form.suburb.id_for_label }}">Suburb:</label>
+                {{ form.suburb }}
+            </div>
+            <div class="form-group">
+                {{ form.street_address.errors }}
+                <label for="{{ form.street_address.id_for_label }}">Street Address:</label>
+                {{ form.street_address }}
+            </div>
+            <div class="form-group">
+                {{ form.postal_code.errors }}
+                <label for="{{ form.postal_code.id_for_label }}">Postal Code:</label>
+                {{ form.postal_code }}
+            </div>
+            <button type="submit">Save Changes</button>
+        </form>
+        <p><a href="{% url 'user_profile' %}" class="back-link">Back to Profile</a></p>
+    </div>
+</body>
+</html>

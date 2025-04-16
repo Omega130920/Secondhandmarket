@@ -35,7 +35,7 @@
         input[type="email"],
         input[type="password"],
         input[type="file"],
-        textarea { /* Added style for textarea */
+        textarea {
             width: 100%;
             padding: 10px;
             margin-bottom: 15px;
@@ -113,6 +113,10 @@
         <p><label for="{{ form.id_document.id_for_label }}">{{ form.id_document.label }}</label> {{ form.id_document }}</p>
         <p><label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label> {{ form.password }}</p>
         <p><label for="{{ form.password_confirm.id_for_label }}">{{ form.password_confirm.label }}</label> {{ form.password_confirm }}</p>
+
+        {#  Add the username field here #}
+        <p><label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label> {{ form.username }}</p>
+
 
         {# New address fields in the template #}
         <p><label for="{{ form.region.id_for_label }}">{{ form.region.label }}</label> {{ form.region }} {{ form.region.errors }}</p>

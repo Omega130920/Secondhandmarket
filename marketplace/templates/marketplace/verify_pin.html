@@ -2,28 +2,31 @@
 <html>
 <head>
     <title>Verify PIN</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #007bff; }
+        form { max-width: 300px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"] { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button[type="submit"] { background-color: #28a745; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
+        .error { color: red; margin-top: 10px; }
+    </style>
 </head>
 <body>
-    <h1>Verify Your Account</h1>
+    <h1>Verify Your PIN</h1>
     {% if messages %}
-        <div>
+        <ul class="messages">
             {% for message in messages %}
-                <p {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
             {% endfor %}
-        </div>
+        </ul>
     {% endif %}
-    {% if email %}
-        <p>A verification PIN has been sent to your email address: <strong>{{ email }}</strong>. Please enter it below.</p>
-        <form method="post">
-            {% csrf_token %}
-            <p>{{ form.pin.label_tag }} {{ form.pin }}</p>
-            <button type="submit">Verify PIN</button>
-        </form>
-        <p>Didn't receive the PIN? (We'll implement resend later)</p>
-    {% else %}
-        <p>Something went wrong. Please try registering again.</p>
-        <p><a href="{% url 'register' %}">Register</a></p>
-    {% endif %}
-    <p><a href="{% url 'home' %}">Back to Home</a></p>
+    <form method="post">
+        {% csrf_token %}
+        <label for="pin">Enter Verification PIN:</label>
+        <input type="text" id="pin" name="pin" required>
+        <button type="submit">Verify</button>
+    </form>
+    <p><a href="{% url 'register' %}">Resend PIN (not implemented yet)</a></p>
 </body>
 </html>
