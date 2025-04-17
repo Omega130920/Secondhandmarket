@@ -61,8 +61,12 @@ class Item(models.Model):
         default='good'
     )
     price = models.DecimalField(max_digits=10, decimal_places=2)
+<<<<<<< HEAD
     selling_price = models.DecimalField(max_digits=10, decimal_places=2,
                                         null=True, blank=True)  # ADD THIS LINE
+=======
+    selling_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True) # ADD THIS LINE
+>>>>>>> e955cf43bf9b0620a0e0436571bd7868d4d692e6
     image1 = models.ImageField(upload_to='item_images/', null=True, blank=True)
     image2 = models.ImageField(upload_to='item_images/', null=True, blank=True)
     image3 = models.ImageField(upload_to='item_images/', null=True, blank=True)
@@ -85,15 +89,24 @@ class Item(models.Model):
 
     def save(self, *args, **kwargs):
         # Calculate and set selling_price before saving.  Use the ROUND function.
+<<<<<<< HEAD
         if self.price is not None:  # added null check
             self.selling_price = round(self.price * Decimal('1.1'), 2)  # Convert 1.1 to Decimal
         super().save(*args, **kwargs)  # Save the model FIRST
+=======
+        self.selling_price = round(self.price * 1.1, 2)  # Round to 2 decimal places
+        super().save(*args, **kwargs) # Save the model FIRST
+>>>>>>> e955cf43bf9b0620a0e0436571bd7868d4d692e6
 
         for img_field_name in ['image1', 'image2', 'image3', 'image4', 'image5', 'image6']:
             img = getattr(self, img_field_name)
             thumb_field_name = f'{img_field_name}_thumbnail'
             if img:
+<<<<<<< HEAD
                 self.create_thumbnail(img, thumb_field_name, (300, 300))
+=======
+                thumbnail = self.create_thumbnail(img, thumb_field_name, (300, 300))
+>>>>>>> e955cf43bf9b0620a0e0436571bd7868d4d692e6
 
     def create_thumbnail(self, image_field, thumb_field_name, size):
         img = Image.open(image_field)
@@ -114,6 +127,10 @@ class Item(models.Model):
         setattr(self, thumb_field_name, thumb_file)
         return thumb_file
 
+<<<<<<< HEAD
+=======
+from django.contrib.auth.models import User
+>>>>>>> e955cf43bf9b0620a0e0436571bd7868d4d692e6
 
 class Message(models.Model):
     sender = models.ForeignKey(User, related_name='sent_messages', on_delete=models.CASCADE)
