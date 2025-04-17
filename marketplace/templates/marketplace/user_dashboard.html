@@ -296,7 +296,7 @@
             {% for item_data in items_to_pay %}
             <li>
                 <h3>{{ item_data.item.title }}</h3>
-                <p>Price: {{ item_data.item.price }}</p>
+                <p>Price: {{ item_data.item.selling_price }}</p>
                 {% for message in item_data.messages %}
                     {% if request.user.is_seller %}
                         <p>Awaiting payment from {{ message.sender.username }}.</p>

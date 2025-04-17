@@ -119,8 +119,12 @@
                 <div class="item-card">
                     <a href="{% url 'item_detail' item.id %}" class="card-link">
                         <div class="card-image-container">
-                            {% if item.image1_thumbnail %}
-                                <img src="{{ item.image1_thumbnail.url }}" alt="{{ item.title }}" class="card-image-thumbnail">
+                            {% if item.image1 or item.image2 or item.image3 or item.image4 or item.image5 or item.image6 %}
+                                {% if item.image1_thumbnail %}
+                                    <img src="{{ item.image1_thumbnail.url }}" alt="{{ item.title }}" class="card-image-thumbnail">
+                                {% else %}
+                                     <img src="{{ item.image1.url }}" alt="{{ item.title }}" class="card-image-thumbnail">
+                                {% endif %}
                                 {% with total_images=0 %}
                                     {% if item.image1 %}{% with total_images=total_images|add:1 %}{% endwith %}{% endif %}
                                     {% if item.image2 %}{% with total_images=total_images|add:1 %}{% endwith %}{% endif %}
@@ -139,7 +143,7 @@
                         <div class="card-details">
                             <h2 class="card-title">{{ item.title }}</h2>
                             <p class="card-category">Category: {{ item.category.name }}</p>
-                            <p class="card-price">Price: {{ item.price }}</p>
+                            <p class="card-price">Price: {{ item.selling_price }}</p>
                         </div>
                     </a>
                 </div>
