@@ -57,6 +57,7 @@ class Item(models.Model):
         default='good'
     )
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    selling_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True) # ADD THIS LINE
     image1 = models.ImageField(upload_to='item_images/', null=True, blank=True)
     image2 = models.ImageField(upload_to='item_images/', null=True, blank=True)
     image3 = models.ImageField(upload_to='item_images/', null=True, blank=True)
@@ -76,12 +77,15 @@ class Item(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        for img_field in ['image1', 'image2', 'image3', 'image4', 'image5', 'image6']:
-            img = getattr(self, img_field)
-            thumb_field = f'{img_field}_thumbnail'
+        # Calculate and set selling_price before saving.  Use the ROUND function.
+        self.selling_price = round(self.price * 1.1, 2)  # Round to 2 decimal places
+        super().save(*args, **kwargs) # Save the model FIRST
+
+        for img_field_name in ['image1', 'image2', 'image3', 'image4', 'image5', 'image6']:
+            img = getattr(self, img_field_name)
+            thumb_field_name = f'{img_field_name}_thumbnail'
             if img:
-                self.create_thumbnail(img, getattr(self, thumb_field), (300, 300)) # Adjust size as needed
+                thumbnail = self.create_thumbnail(img, thumb_field_name, (300, 300))
 
     def create_thumbnail(self, image_field, thumb_field_name, size):
         img = Image.open(image_field)
@@ -100,18 +104,7 @@ class Item(models.Model):
             None
         )
         setattr(self, thumb_field_name, thumb_file)
-        return thumb_file  # Return the created thumbnail file
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        for img_field_name in ['image1', 'image2', 'image3', 'image4', 'image5', 'image6']:
-            img = getattr(self, img_field_name)
-            thumb_field_name = f'{img_field_name}_thumbnail'
-            if img:
-                thumbnail = self.create_thumbnail(img, thumb_field_name, (300, 300))
-                # No need to explicitly save here, as the super().save() at the beginning
-                # and the subsequent save() at the end will handle it.
-        super().save(*args, **kwargs) # Save again after creating thumbnails
+        return thumb_file
 
 from django.contrib.auth.models import User
 

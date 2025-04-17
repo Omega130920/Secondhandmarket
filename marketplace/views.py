@@ -193,6 +193,8 @@ def item_detail_view(request, item_id):
             payment_processed=True
         ).exists()
 
+    # Explicitly fetch the selling_price.
+    item = Item.objects.get(id=item_id) # add this line
     context = {
         'item': item,
         'is_buyer': is_buyer,
